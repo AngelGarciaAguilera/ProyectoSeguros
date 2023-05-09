@@ -11,7 +11,7 @@ import java.util.ArrayList;
  * @author mint
  */
 public class Oficina {
-    
+
     private String codOficina;
     private String nombre;
     private String direccion;
@@ -19,7 +19,7 @@ public class Oficina {
     private String cp;
     private String telefono;
     private String email;
-    
+
     private ArrayList<Cliente> clientes;
 
     public Oficina(String codOficina, String nombre, String direccion, String ciudad, String cp, String telefono, String email) {
@@ -30,15 +30,52 @@ public class Oficina {
         this.cp = cp;
         this.telefono = telefono;
         this.email = email;
-        
+
         clientes = new ArrayList<>();
     }
 
-    public boolean addCliente(String dni, String codigoPoliza, String nombre, String apellidos, String direccionPostal, String telefono, String email){
+    public Oficina(String sCSV) {
+        //Divido las líneas por salto de línea y las almaceno en un Array.
+        String[] lineas = sCSV.split("\n");   
+        //Divido estas líneas en columnas por el ;.
+        //En la primera columna de la primera fila, debe estar el nombre de la clase.
+        String[] columnas = lineas[0].split(";");
+        
+        if (columnas[0].equals("Oficina")) {
+            //Si es Oficina, tenemos un objeto Oficina.
+            this.codOficina = columnas[1];
+            this.nombre = columnas[2];
+            this.direccion = columnas[3];
+            this.ciudad = columnas[4];
+            this.cp = columnas[5];
+            this.telefono = columnas[6];
+            this.email = columnas[7];
+        } else {
+            //Si no, nos salimos.
+            return;
+        }
+
+        //Construyo el ArrayList de clientes.
+        this.clientes = new ArrayList<>();
+        //Divido por clientes para obtener los clientes que tengo.
+        String[] clientesPosibles = sCSV.split("Cliente");
+        String miClienteCSV;
+
+        for (int i = 1; i < clientesPosibles.length; i++) {
+            //Recorro los clientes y lo guardo en el String, añadiéndole el Cliente que se ha eliminado antes.
+            miClienteCSV = "Cliente" + clientesPosibles[i];
+            //Este String lo paso al constructor de Cliente por CSV.
+            Cliente c = new Cliente(miClienteCSV);
+            //Añado este cliente a la lista.
+            clientes.add(c);
+        }
+    }
+
+    public boolean addCliente(String dni, String codigoPoliza, String nombre, String apellidos, String direccionPostal, String telefono, String email) {
         //Recorre todos los clientes de la Lista.
-        for(Cliente c : clientes){
+        for (Cliente c : clientes) {
             //Si el dni introducido ya pertenece a un cliente, da error y no se crea el cliente.
-            if(c.getDni().equals(dni)){
+            if (c.getDni().equals(dni)) {
                 return false;
             }
         }
@@ -47,21 +84,21 @@ public class Oficina {
         clientes.add(cliente);
         return true;
     }
-    
-    public boolean deleteCliente(String dni){
+
+    public boolean deleteCliente(String dni) {
         //Recorre todos los clientes de la Lista.
         Cliente c = this.buscarCliente(dni);
-        if(c != null){
-            if(!c.getIncidencias().isEmpty()){
+        if (c != null) {
+            if (!c.getIncidencias().isEmpty()) {
                 //Si este cliente tiene incidencias...                
-                if(!c.incidenciaPendiente(c.getCodigoPoliza())){
+                if (!c.incidenciaPendiente(c.getCodigoPoliza())) {
                     //Si no está pendiente, lo puede eliminar.
                     clientes.remove(c);
                     return true;
                 }
                 //Si tiene incidencias pendientes, devuelve false.
                 return false;
-            }   
+            }
             //Si no tiene incidencias, lo elimina y devuelve true.
             clientes.remove(c);
             return true;
@@ -69,13 +106,13 @@ public class Oficina {
         //Si no existe el cliente, devulve false.
         return false;
     }
-    
-    public boolean updateCliente(String dniIn, String dni, String codigoPoliza, String nombre, String apellidos, String direccionPostal, String telefono, String email){
+
+    public boolean updateCliente(String dniIn, String dni, String codigoPoliza, String nombre, String apellidos, String direccionPostal, String telefono, String email) {
         //Creo un Cliente en el que guardo el resultado de la búsqueda por DNI.
         //Esta puede devolver null si no se ha encontrado ningún cliente con el DNI proporcionado.
         Cliente c = this.buscarCliente(dniIn);
         //Controlo si ha devuelto null o un Cliente.
-        if(c != null){
+        if (c != null) {
             //Actualizo todos los datos del Cliente.
             c.setDni(dni);
             c.setNombre(nombre);
@@ -84,48 +121,48 @@ public class Oficina {
             c.setDireccionPostal(direccionPostal);
             c.setTelefono(telefono);
             c.setEmail(email);
-            
+
             return true;
         }
         //Si no existe Cliente con el DNI proporcionado, devuelve false;
         return false;
-        
+
     }
-    
-    public Cliente buscarCliente(String dni){
+
+    public Cliente buscarCliente(String dni) {
         //Recorre todos los clientes de la Lista.
-        for(Cliente c : clientes){
+        for (Cliente c : clientes) {
             //Si el dni introducido ya pertenece a un cliente, devuelve ese cliente.
-            if(c.getDni().equals(dni)){
+            if (c.getDni().equals(dni)) {
                 return c;
             }
         }
         //Si no se ha encontrado ningún Cliente con el DNI introducido, devulve null.
         return null;
     }
-    
-    public Cliente[] buscarClientes(String apellidos){
+
+    public Cliente[] buscarClientes(String apellidos) {
         //Creo una Lista para almacenar los clientes que tengan los apellidos introducidos.
         ArrayList<Cliente> clientesEncontrados = new ArrayList<>();
-        
-        for(Cliente c : clientes){
+
+        for (Cliente c : clientes) {
             //Si los apellidos introducidos pertenecen a el Cliente, este se añade a la Lista.
-            if(c.getApellidos().equals(apellidos)){
+            if (c.getApellidos().equals(apellidos)) {
                 clientesEncontrados.add(c);
             }
         }
         //Compruebo si la Lista no está vacía.
-        if(!clientesEncontrados.isEmpty()){
+        if (!clientesEncontrados.isEmpty()) {
             //Creo un Array con el tamaño de la Lista anterior y lo devuelvo.
             Cliente[] listaC = new Cliente[clientesEncontrados.size()];
             return clientesEncontrados.toArray(listaC);
         }
         return null;
     }
-    
-    public Cliente[] listarClientes(){
+
+    public Cliente[] listarClientes() {
         //Compruebo si la Lista está vacía.
-        if(clientes.isEmpty()){
+        if (clientes.isEmpty()) {
             //Si está vacía devuelve null.
             return null;
         }
@@ -133,7 +170,7 @@ public class Oficina {
         Cliente[] listaC = new Cliente[clientes.size()];
         return clientes.toArray(listaC);
     }
-    
+
     public String getCodOficina() {
         return codOficina;
     }
@@ -188,5 +225,13 @@ public class Oficina {
 
     public void setEmail(String email) {
         this.email = email;
-    }         
+    }
+    
+    public String toCSV() {
+        String cadena = String.format("Oficina;%s;%s;%s;%s;%s;%s;%s\n", codOficina, nombre, direccion, ciudad, cp, telefono, email);
+        for (Cliente c : clientes) {
+            cadena += c.toCSV();
+        }
+        return cadena;
+    }
 }

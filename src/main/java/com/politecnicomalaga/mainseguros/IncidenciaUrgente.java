@@ -18,8 +18,22 @@ public class IncidenciaUrgente extends Incidencia{
         this.tipo = "IncidenciaUrgente";
     }
     
+    public IncidenciaUrgente(String sCsv) {
+        super(sCsv);
+        String[] columnas = sCsv.split(";");
+
+        if (columnas[0].equals("Incidencia")) {
+            this.maxDias = Integer.parseInt(columnas[8]);
+        }
+    }
+    
     @Override
     public String toString(){
         return super.toString() + "#" + maxDias;
+    }
+    
+    @Override
+    public String toCSV() {
+        return String.format("Incidencia;%s;%s;%s;%s;%s;%s;%b;%d\n", fecha, hora, matriculaPropia, matriculaAjena, descripcion, codigoIncidencia, cobrado, maxDias);
     }
 }

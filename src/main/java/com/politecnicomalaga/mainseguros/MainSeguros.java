@@ -60,6 +60,14 @@ public class MainSeguros {
                         mostrarClientes(sc);
                         break;
 
+                    case 8:
+                        saveOficina();
+                        break;
+
+                    case 9:
+                        loadOficina(sc);
+                        break;
+                        
                     case -1:
                         System.out.println("Introduzca un número como opción.");
                         break;
@@ -487,13 +495,30 @@ public class MainSeguros {
         }
     }
     
-    private static void saveOficina(){
+    private static void saveOficina() {
+        if (ControladorFicheros.writeText("Oficina.csv", miOficina.toCSV())) {
+            System.out.println("Proceso de volcado a disco exitoso");
+        } else {
+            System.out.println("Error al escribir en disco. ¿Tiene espacio en el disco?");
+        }
+
         String jsonOficina = new Gson().toJson(miOficina);
-        
-        if(ControladorFicheros.writeText("JsonOficina.json", jsonOficina)){
-            System.out.println("Se ha guardado con éxito");
-        }else{
-            System.out.println("Error al escribir en disco");
+
+        if (ControladorFicheros.writeText("oficina.json", jsonOficina)) {
+            System.out.println("Proceso de volcado json a disco exitoso");
+        } else {
+            System.out.println("Error al escribir en disco. ¿Tiene espacio en el disco?");
+        }
+    }
+
+    private static void loadOficina(Scanner sc) {
+        System.out.println("Se van a recargar los datos desde disco");
+        System.out.println("Todos los datos actuales serán sustituidos");
+        System.out.println("¿Está seguro?(S para Sí; Otra letra para No) ");
+        String respuesta = leerStringTeclado(sc);
+        if (respuesta.equals("S")) {
+            miOficina = new Oficina(ControladorFicheros.readText("Oficina.csv"));
+            System.out.println("Fichero cargado con éxito.");
         }
     }
 }
