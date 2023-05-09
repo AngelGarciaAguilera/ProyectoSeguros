@@ -38,8 +38,9 @@ public class Oficina {
         //Divido las líneas por salto de línea y las almaceno en un Array.
         String[] lineas = sCSV.split("\n");   
         //Divido estas líneas en columnas por el ;.
-        //En la primera columna de la primera fila, debe estar el nombre de la clase.
-        String[] columnas = lineas[0].split(";");
+        //En la primera columna de la segunda fila, debe estar el nombre de la clase.
+        //Es la segunda fila porque al leerlo se introduce un \n al inicio.
+        String[] columnas = lineas[1].split(";");
         
         if (columnas[0].equals("Oficina")) {
             //Si es Oficina, tenemos un objeto Oficina.

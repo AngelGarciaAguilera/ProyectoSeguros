@@ -255,12 +255,8 @@ public class Cliente {
         String cadena = String.format("Cliente;%s;%s;%s;%s;%s;%s;%s\n", dni, codigoPoliza, nombre, apellidos, direccionPostal, telefono, email);
         for (Map.Entry<String, Incidencia> entry : incidencias.entrySet()) {
             //Esto es un forEach para HashMap
-            //Guardo el valor de la clave.
-            String clave = entry.getKey();
-            //Creo un objeto, asignandole los valores del objeto por el que va el for.
-            Incidencia incidencia = entry.getValue();
             //Paso a CSV este objeto.
-            cadena += incidencia.toCSV();
+            cadena += entry.getValue().toCSV();
         }
         return cadena;
     }

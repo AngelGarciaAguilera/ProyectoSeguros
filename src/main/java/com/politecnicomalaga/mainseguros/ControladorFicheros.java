@@ -4,6 +4,7 @@
  */
 package com.politecnicomalaga.mainseguros;
 
+import com.google.gson.Gson;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -19,22 +20,23 @@ public class ControladorFicheros {
     public static boolean writeText(String fileName, String data) {
 
         PrintWriter out = null;
-        
-        try{
+
+        try {
             out = new PrintWriter(new FileWriter(fileName));
-            out.print(data); 
+            out.print(data);
             out.flush(); //Aseguramos que todo pasa a disco
-        }catch(IOException io){  
+        } catch (IOException io) {
             System.out.println(io.getMessage());
             return false;
-        }finally{
-            if(out != null){
+        } finally {
+            if (out != null) {
                 out.close();
             }
         }
         return true;
     }
 
+    
     public static String readText(String fileName) {  
 
         Scanner sc = null;
@@ -54,5 +56,13 @@ public class ControladorFicheros {
             }            
         }
         return texto;
+    }
+    
+    public static void writeJson(Object object, String path) throws IOException {
+        writeText(path, new Gson().toJson(object));
+    }
+
+    public static Object readJson(String json, Object object) {
+        return new Gson().fromJson(json, object.getClass());
     }
 }

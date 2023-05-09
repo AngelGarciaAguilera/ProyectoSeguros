@@ -44,8 +44,8 @@ public class Incidencia {
             this.fecha = columnas[1];
             this.hora = Integer.parseInt(columnas[2]);
             this.matriculaPropia = columnas[3];
-            this.matriculaAjena = (columnas[4]);
-            this.descripcion = (columnas[5]);
+            this.matriculaAjena = columnas[4];
+            this.descripcion = columnas[5];
             this.codigoIncidencia = columnas[6];
             this.cobrado = Boolean.parseBoolean(columnas[7]);
         } else {

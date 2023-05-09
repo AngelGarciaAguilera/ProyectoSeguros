@@ -4,6 +4,7 @@
 package com.politecnicomalaga.mainseguros;
 
 import com.google.gson.Gson;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.InputMismatchException;
 import java.util.Map;
@@ -65,9 +66,17 @@ public class MainSeguros {
                         break;
 
                     case 9:
-                        loadOficina(sc);
+                        loadOficina();
                         break;
-                        
+
+                    case 10:
+                        saveOficinaJSON();
+                        break;
+
+                    case 11:
+                        loadOficinaJSON();
+                        break;
+                    
                     case -1:
                         System.out.println("Introduzca un número como opción.");
                         break;
@@ -306,7 +315,7 @@ public class MainSeguros {
                 case 4:
                     pagarIncidencia(sc, c);
                     break;
-                    
+
                 default:
                     break;
             }
@@ -356,9 +365,9 @@ public class MainSeguros {
                         eliminarIncidencia(sc, cli);
                     } else {
                         System.out.println("El DNI introducido no pertenece a ningún Cliente.");
-                    }                    
+                    }
                     break;
-                    
+
                 case 3:
                     System.out.println("DNI del Cliente:");
                     dni = leerStringTeclado(sc);
@@ -367,7 +376,7 @@ public class MainSeguros {
                         mostrarIncidencias(sc, cli);
                     } else {
                         System.out.println("El DNI introducido no pertenece a ningún Cliente.");
-                    }                    
+                    }
                     break;
 
                 case 4:
@@ -378,9 +387,9 @@ public class MainSeguros {
                         mostrarIncidencias(sc, cli);
                     } else {
                         System.out.println("El DNI introducido no pertenece a ningún Cliente.");
-                    }                    
+                    }
                     break;
-                    
+
                 default:
                     break;
             }
@@ -447,11 +456,11 @@ public class MainSeguros {
             System.out.println(c.listarIncidencias());
             System.out.println("Introduce el código de incidencia de la Incidencia a eliminar:");
             codigoIncidencia = leerStringTeclado(sc);
-            if(c.deleteIncidencia(codigoIncidencia)){                
+            if (c.deleteIncidencia(codigoIncidencia)) {
                 System.out.println("Incidencia eliminada con éxito.");
-            }else{
+            } else {
                 System.out.println("La incidencia está pendiente de pago.");
-            }            
+            }
         } else {
             System.out.println("Aún no se ha añadido ninguna Incidencia.");
         }
@@ -469,10 +478,10 @@ public class MainSeguros {
             System.out.println("Aún no se ha añadido ninguna Incidencia.");
         }
     }
-    
+
     private static void pagarIncidencia(Scanner sc, Cliente c) {
         String codigoIncidencia;
-        
+
         System.out.println("\n---------------------------------------");
         System.out.println("PAGAR INCIDENCIA\n");
         System.out.println("---------------------------------------");
@@ -481,44 +490,49 @@ public class MainSeguros {
             System.out.println(c.listarIncidencias());
             System.out.println("Introduce el código de incidencia de la Incidencia a pagar:");
             codigoIncidencia = leerStringTeclado(sc);
-            if(c.buscarIncidencia(codigoIncidencia) != null){
+            if (c.buscarIncidencia(codigoIncidencia) != null) {
                 //Si encuentra una incidencia...
                 Incidencia i = c.buscarIncidencia(codigoIncidencia);
                 //La cobra.
                 i.setCobrado();
                 System.out.println("Incidencia cobrada con éxito.");
-            }else{
+            } else {
                 System.out.println("El código incidencia introducino no pertenece a ninguna incidencia.");
-            }  
+            }
         } else {
             System.out.println("Aún no se ha añadido ninguna Incidencia.");
         }
     }
-    
+
     private static void saveOficina() {
         if (ControladorFicheros.writeText("Oficina.csv", miOficina.toCSV())) {
             System.out.println("Proceso de volcado a disco exitoso");
         } else {
             System.out.println("Error al escribir en disco. ¿Tiene espacio en el disco?");
         }
-
-        String jsonOficina = new Gson().toJson(miOficina);
-
-        if (ControladorFicheros.writeText("oficina.json", jsonOficina)) {
-            System.out.println("Proceso de volcado json a disco exitoso");
-        } else {
-            System.out.println("Error al escribir en disco. ¿Tiene espacio en el disco?");
-        }
     }
 
-    private static void loadOficina(Scanner sc) {
-        System.out.println("Se van a recargar los datos desde disco");
-        System.out.println("Todos los datos actuales serán sustituidos");
-        System.out.println("¿Está seguro?(S para Sí; Otra letra para No) ");
-        String respuesta = leerStringTeclado(sc);
-        if (respuesta.equals("S")) {
-            miOficina = new Oficina(ControladorFicheros.readText("Oficina.csv"));
-            System.out.println("Fichero cargado con éxito.");
-        }
+    private static void loadOficina() {
+        String csv;
+        csv = ControladorFicheros.readText("Oficina.csv");
+        miOficina = new Oficina(csv);
+        System.out.println("Fichero cargado con éxito.");
     }
+
+    private static void saveOficinaJSON() {
+        try{
+            ControladorFicheros.writeJson(miOficina, "Oficina.json");
+            System.out.println("Se ha exportado la oficina...");
+        }catch(IOException io){
+            System.out.println("No se ha encontrado el archivo");
+        }
+        
+    }
+
+    private static void loadOficinaJSON() {
+        String json = ControladorFicheros.readText("Oficina.json");
+        miOficina = (Oficina) ControladorFicheros.readJson(json, miOficina);
+        System.out.println("Se ha importado la oficina...");
+    }
+
 }
